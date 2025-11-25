@@ -1,0 +1,656 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>EduQuest Modern</title>
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --primary: #6C63FF;
+    --correct: #00E676;
+    --wrong: #FF5252;
+    --bg-glass: rgba(255, 255, 255, 0.1);
+    --shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.37);
+  }
+
+  * { box-sizing: border-box; }
+
+  body {
+    margin: 0; 
+    font-family: 'Poppins', sans-serif;
+    background: linear-gradient(135deg, #1c093c, #2b1055, #7597de);
+    background-size: 400% 400%;
+    animation: gradientBG 15s ease infinite;
+    display: flex; align-items: center; justify-content: center;
+    color: #fff; min-height: 100vh;
+  }
+
+  @keyframes gradientBG {
+    0% { background-position: 0% 50%; }
+    50% { background-position: 100% 50%; }
+    100% { background-position: 0% 50%; }
+  }
+
+  .app { 
+    width: 100%; max-width: 400px; 
+    padding: 25px; 
+    border-radius: 24px;
+    background: var(--bg-glass);
+    box-shadow: var(--shadow);
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
+    border: 1px solid rgba(255, 255, 255, 0.18);
+    transition: height 0.3s ease;
+  }
+
+  h1 { margin: 0 0 5px; font-size: 26px; text-align:center; font-weight: 700; letter-spacing: 1px;}
+  p.subtitle { margin: 0 0 20px; color: rgba(255,255,255,0.7); text-align:center; font-size: 14px; }
+
+  /* BUTTONS GENERAL */
+  button {
+    width: 100%; padding: 14px; border: none; border-radius: 16px;
+    margin-top: 12px; background: rgba(255,255,255,0.15);
+    color: #fff; font-weight: 600; font-size: 15px; cursor: pointer;
+    transition: all 0.3s ease; box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+    font-family: 'Poppins', sans-serif;
+  }
+  button:hover { background: rgba(255,255,255,0.25); transform: translateY(-2px); }
+  button:active { transform: scale(0.98); }
+
+  /* GRID MAPEL */
+  .grid-mapel { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+  .grid-mapel button { margin-top: 0; height: 80px; font-size: 13px; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 5px; }
+  .grid-mapel button span { font-size: 20px; }
+
+  /* QUIZ AREA */
+  .quiz-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; font-size: 14px; font-weight: 600; color: rgba(255,255,255,0.8); }
+  
+  /* TIMER BAR */
+  .timer-container { width: 100%; height: 6px; background: rgba(255,255,255,0.2); border-radius: 10px; margin-bottom: 20px; overflow: hidden; position: relative; }
+  .timer-bar { height: 100%; background: #00d2ff; width: 100%; transition: width 1s linear; }
+  .timer-text { text-align: center; font-weight: 700; font-size: 18px; margin-bottom: 15px; }
+  
+  #qText { font-size: 16px; font-weight: 600; line-height: 1.5; text-align: center; margin-bottom: 25px; min-height: 60px; display:flex; align-items:center; justify-content:center;}
+
+  .opt { 
+    background: rgba(255, 255, 255, 0.1); padding: 15px; border-radius: 12px; 
+    margin-bottom: 10px; cursor: pointer; border: 2px solid transparent; 
+    transition: all 0.2s; font-size: 14px; display: flex; align-items: center;
+  }
+  .opt:hover { background: rgba(255,255,255,0.2); transform: translateX(5px); }
+  
+  /* STATES */
+  .opt.correct { background: rgba(0, 230, 118, 0.2); border-color: var(--correct); color: var(--correct); font-weight: bold; }
+  .opt.wrong { background: rgba(255, 82, 82, 0.2); border-color: var(--wrong); color: var(--wrong); opacity: 0.8; }
+  .disabled { pointer-events: none; }
+
+  /* NEXT BUTTON */
+  #nextBtn { background: linear-gradient(90deg, #6C63FF, #4834d4); margin-top: 20px; }
+  #nextBtn:hover { box-shadow: 0 0 15px #6C63FF; }
+
+  /* RESULT */
+  .result-score { font-size: 48px; font-weight: 800; margin: 20px 0; text-shadow: 0 0 20px rgba(255,255,255,0.5); }
+</style>
+</head>
+<body>
+
+<div class="app">
+  <div id="mapel">
+    <h1>EduQuest</h1>
+    <p class="subtitle">Pilih Mata Pelajaran Favoritmu</p>
+    <div class="grid-mapel">
+      <button onclick="pilihMapel('matematika')"><span>🧮</span>Matematika</button>
+      <button onclick="pilihMapel('fisika')"><span>⚛️</span>Fisika</button>
+      <button onclick="pilihMapel('sejarah')"><span>📜</span>Sejarah</button>
+      <button onclick="pilihMapel('ekonomi')"><span>💰</span>Ekonomi</button>
+      <button onclick="pilihMapel('senbud')"><span>🎨</span>Seni Budaya</button>
+      <button onclick="pilihMapel('sosiologi')"><span>👥</span>Sosiologi</button>
+      <button onclick="pilihMapel('geografi')"><span>🌍</span>Geografi</button>
+      <button onclick="pilihMapel('kimia')"><span>⚗️</span>Kimia</button>
+      <button onclick="pilihMapel('biologi')"><span>🧬</span>Biologi</button>
+    </div>
+  </div>
+
+  <div id="menu" style="display:none; text-align:center;">
+    <h1>Tingkat Kesulitan</h1>
+    <p class="subtitle">Seberapa jauh kemampuanmu?</p>
+    <button onclick="startGame('mudah')" style="border-left: 5px solid #00E676;">🌱 Mudah</button>
+    <button onclick="startGame('sedang')" style="border-left: 5px solid #FFD740;">⚙️ Sedang</button>
+    <button onclick="startGame('sulit')" style="border-left: 5px solid #FF5252;">🔥 Sulit</button>
+    <button onclick="backToMapel()" style="background:transparent; opacity:0.7; margin-top:20px;">🔙 Kembali</button>
+  </div>
+
+  <div id="quiz" style="display:none;">
+    <div class="quiz-header">
+      <span onclick="backToMapel()" style="cursor:pointer;">✕ Keluar</span>
+      <span id="progress">1 / 10</span>
+    </div>
+    
+    <div class="timer-text" id="timerNum">10</div>
+    <div class="timer-container"><div id="timerBar" class="timer-bar"></div></div>
+
+    <div id="qText">Soal akan muncul di sini...</div>
+    <div id="options"></div>
+    
+    <button id="nextBtn" onclick="nextQuestion()" style="display:none;">Lanjut ➡️</button>
+  </div>
+
+  <div id="final" style="display:none; text-align:center;">
+    <h1>Selesai! 🏆</h1>
+    <p class="subtitle">Skor Akhir Kamu</p>
+    <div id="finalScore" class="result-score">0</div>
+    <p id="finalMsg">Luar Biasa!</p>
+    <button onclick="backToMapel()">🏠 Menu Utama</button>
+  </div>
+</div>
+
+<script>
+// ==========================================
+// DATABASE 270 SOAL LENGKAP
+// ==========================================
+const soalMapel = {
+  matematika: {
+    mudah: [
+      {q:"2 + 2 x 3 = ?", correct:"8", opts:["8","6","12","10"]},
+      {q:"Lambang bilangan Romawi untuk 10 adalah?", correct:"X", opts:["V","X","L","C"]},
+      {q:"Sudut siku-siku besarnya ... derajat", correct:"90", opts:["45","90","180","360"]},
+      {q:"1 jam sama dengan ... menit", correct:"60", opts:["100","60","30","24"]},
+      {q:"Bangun datar yang memiliki 3 sisi disebut?", correct:"Segitiga", opts:["Segiempat","Segitiga","Lingkaran","Trapesium"]},
+      {q:"Hasil dari 50 - 25 adalah?", correct:"25", opts:["20","30","25","15"]},
+      {q:"Berapa sisi yang dimiliki kubus?", correct:"6", opts:["4","6","8","12"]},
+      {q:"Angka romawi V melambangkan angka?", correct:"5", opts:["1","5","10","50"]},
+      {q:"100 dibagi 4 sama dengan?", correct:"25", opts:["20","25","10","50"]},
+      {q:"Benda berbentuk bola adalah?", correct:"Kelereng", opts:["Kelereng","Buku","Papan Tulis","Kotak Pensil"]}
+    ],
+    sedang: [
+      {q:"Rumus luas persegi panjang adalah?", correct:"p x l", opts:["p x l","s x s","a x t","p + l"]},
+      {q:"Akar pangkat dua dari 81 adalah?", correct:"9", opts:["8","9","7","6"]},
+      {q:"Sudut yang besarnya lebih dari 90 derajat disebut?", correct:"Tumpul", opts:["Lancip","Tumpul","Siku-siku","Lurus"]},
+      {q:"Nilai phi (π) kira-kira adalah?", correct:"3.14", opts:["3.14","2.14","4.14","3.5"]},
+      {q:"Faktor persekutuan terbesar (FPB) dari 12 dan 16?", correct:"4", opts:["2","4","8","6"]},
+      {q:"Jika 3x = 15, maka x = ?", correct:"5", opts:["3","5","12","45"]},
+      {q:"1 km sama dengan ... meter", correct:"1000", opts:["100","1000","10","10000"]},
+      {q:"Rumus keliling lingkaran adalah?", correct:"2πr", opts:["πr²","2πr","πd²","2πd"]},
+      {q:"Bilangan prima antara 10 dan 20 adalah?", correct:"11, 13, 17, 19", opts:["11, 13, 15, 17","11, 13, 17, 19","11, 15, 17, 19","13, 15, 17, 19"]},
+      {q:"-5 + 8 = ?", correct:"3", opts:["-3","3","-13","13"]}
+    ],
+    sulit: [
+      {q:"Turunan dari sin(x) adalah?", correct:"cos(x)", opts:["-sin(x)","cos(x)","-cos(x)","tan(x)"]},
+      {q:"Nilai dari 2 pangkat 10 adalah?", correct:"1024", opts:["512","1024","2048","1000"]},
+      {q:"Integral dari 2x dx adalah?", correct:"x² + C", opts:["2x² + C","x² + C","x + C","2 + C"]},
+      {q:"Rumus Diskriminan pada persamaan kuadrat?", correct:"b² - 4ac", opts:["b² - 4ac","b² + 4ac","4ac - b²","b - 4ac"]},
+      {q:"Sin 30° + Cos 60° = ?", correct:"1", opts:["0.5","1","0","0.25"]},
+      {q:"Logaritma basis 2 dari 8 adalah?", correct:"3", opts:["2","3","4","8"]},
+      {q:"Limit x mendekati 0 untuk sin(x)/x adalah?", correct:"1", opts:["0","1","Tak hingga","Tak terdefinisi"]},
+      {q:"Jumlah sudut dalam segitiga adalah?", correct:"180°", opts:["90°","180°","360°","270°"]},
+      {q:"Matriks identitas ordo 2x2 memiliki determinan?", correct:"1", opts:["0","1","2","-1"]},
+      {q:"Persamaan lingkaran dengan pusat (0,0) adalah?", correct:"x² + y² = r²", opts:["x² + y² = r²","x + y = r","x² - y² = r²","y = mx + c"]}
+    ]
+  },
+  fisika: {
+    mudah: [
+      {q:"Satuan panjang dalam SI adalah?", correct:"Meter", opts:["Centimeter","Meter","Kilometer","Mil"]},
+      {q:"Gaya gesek arahnya selalu ... gerak benda", correct:"Berlawanan", opts:["Searah","Berlawanan","Tegak lurus","Sejajar"]},
+      {q:"Alat pengukur suhu adalah?", correct:"Termometer", opts:["Barometer","Termometer","Speedometer","Amperemeter"]},
+      {q:"Benda yang dapat ditarik magnet disebut?", correct:"Magnetik", opts:["Magnetik","Non-magnetik","Isolator","Konduktor"]},
+      {q:"Sumber energi terbesar di bumi adalah?", correct:"Matahari", opts:["Bulan","Matahari","Angin","Air"]},
+      {q:"Es mencair adalah perubahan wujud dari?", correct:"Padat ke Cair", opts:["Cair ke Padat","Padat ke Cair","Cair ke Gas","Gas ke Cair"]},
+      {q:"Satuan massa adalah?", correct:"Kilogram", opts:["Gram","Ons","Kilogram","Newton"]},
+      {q:"Bunyi tidak dapat merambat di?", correct:"Ruang hampa", opts:["Air","Udara","Benda padat","Ruang hampa"]},
+      {q:"Gerak benda yang jatuh ke bawah disebabkan oleh?", correct:"Gravitasi", opts:["Pegas","Magnet","Gravitasi","Listrik"]},
+      {q:"Lampu di rumah biasanya dipasang secara?", correct:"Paralel", opts:["Seri","Paralel","Campuran","Sembarang"]}
+    ],
+    sedang: [
+      {q:"Rumus Hukum II Newton?", correct:"F = m.a", opts:["F = m/a","F = m.a","a = F.m","m = F.a"]},
+      {q:"Satuan dari kuat arus listrik?", correct:"Ampere", opts:["Volt","Watt","Ampere","Joule"]},
+      {q:"Energi potensial dipengaruhi oleh?", correct:"Ketinggian", opts:["Kecepatan","Ketinggian","Waktu","Suhu"]},
+      {q:"Kecepatan adalah besaran?", correct:"Vektor", opts:["Skalar","Vektor","Pokok","Turunan"]},
+      {q:"Cepat rambat cahaya di udara sekitar?", correct:"300 juta m/s", opts:["300 m/s","340 m/s","300 juta m/s","3000 m/s"]},
+      {q:"Alat untuk mengukur tegangan listrik?", correct:"Voltmeter", opts:["Amperemeter","Voltmeter","Ohmmeter","Barometer"]},
+      {q:"Hukum Archimedes berhubungan dengan benda?", correct:"Terapung", opts:["Jatuh","Terapung","Berputar","Memantul"]},
+      {q:"Usaha (Work) dirumuskan dengan?", correct:"W = F . s", opts:["W = F . s","W = F / s","W = m . g","W = P . t"]},
+      {q:"Perubahan posisi benda tiap satuan waktu disebut?", correct:"Kecepatan", opts:["Jarak","Perpindahan","Kecepatan","Percepatan"]},
+      {q:"Lensa cembung bersifat?", correct:"Mengumpulkan cahaya", opts:["Menyebarkan cahaya","Mengumpulkan cahaya","Memantulkan cahaya","Menyerap cahaya"]}
+    ],
+    sulit: [
+      {q:"Hukum kekekalan energi mekanik berlaku jika?", correct:"Tidak ada gesekan", opts:["Ada gesekan","Tidak ada gesekan","Benda diam","Benda bergerak lurus"]},
+      {q:"Efek Doppler menjelaskan tentang perubahan?", correct:"Frekuensi bunyi", opts:["Amplitudo bunyi","Frekuensi bunyi","Cepat rambat","Warna bunyi"]},
+      {q:"Partikel penyusun inti atom adalah?", correct:"Proton & Neutron", opts:["Proton & Elektron","Proton & Neutron","Elektron & Neutron","Proton saja"]},
+      {q:"Satuan dari Daya (Power) adalah?", correct:"Watt", opts:["Joule","Newton","Watt","Hertz"]},
+      {q:"Rumus energi kinetik?", correct:"1/2 mv²", opts:["mgh","1/2 mv²","F.s","m.a"]},
+      {q:"Fenomena pembelokan cahaya disebut?", correct:"Refraksi", opts:["Refleksi","Refraksi","Difraksi","Interferensi"]},
+      {q:"Hukum Ohm dirumuskan sebagai?", correct:"V = I . R", opts:["V = I . R","R = V . I","I = V . R","P = V . I"]},
+      {q:"Entropi adalah ukuran dari?", correct:"Ketidakteraturan", opts:["Energi dalam","Ketidakteraturan","Panas jenis","Tekanan"]},
+      {q:"Gelombang elektromagnetik dengan frekuensi tertinggi?", correct:"Sinar Gamma", opts:["Sinar X","Sinar Gamma","Inframerah","Gelombang Radio"]},
+      {q:"Teori Relativitas dikemukakan oleh?", correct:"Einstein", opts:["Newton","Einstein","Bohr","Tesla"]}
+    ]
+  },
+  sejarah: {
+    mudah: [
+      {q:"Presiden pertama Indonesia adalah?", correct:"Soekarno", opts:["Soeharto","Habibie","Soekarno","Jokowi"]},
+      {q:"Warna bendera Indonesia?", correct:"Merah Putih", opts:["Merah Putih","Putih Merah","Merah Kuning","Hijau Putih"]},
+      {q:"Indonesia dijajah Belanda selama kurang lebih?", correct:"350 tahun", opts:["3.5 tahun","35 tahun","350 tahun","100 tahun"]},
+      {q:"Tanggal Sumpah Pemuda?", correct:"28 Oktober", opts:["17 Agustus","28 Oktober","10 November","20 Mei"]},
+      {q:"Kerajaan Majapahit berpusat di?", correct:"Jawa Timur", opts:["Jawa Barat","Jawa Tengah","Jawa Timur","Sumatera"]},
+      {q:"Pahlawan wanita dari Aceh?", correct:"Cut Nyak Dien", opts:["Kartini","Dewi Sartika","Cut Nyak Dien","Fatmawati"]},
+      {q:"Candi Borobudur adalah candi agama?", correct:"Buddha", opts:["Hindu","Buddha","Islam","Konghucu"]},
+      {q:"Hari Pahlawan diperingati setiap?", correct:"10 November", opts:["10 November","1 Oktober","1 Juni","2 Mei"]},
+      {q:"Naskah proklamasi diketik oleh?", correct:"Sayuti Melik", opts:["Sayuti Melik","Soekarno","Hatta","Fatmawati"]},
+      {q:"Lagu Indonesia Raya diciptakan oleh?", correct:"W.R. Supratman", opts:["Kusbini","W.R. Supratman","Ismail Marzuki","Ibu Sud"]}
+    ],
+    sedang: [
+      {q:"Organisasi Budi Utomo berdiri tahun?", correct:"1908", opts:["1908","1928","1945","1905"]},
+      {q:"Perang Dunia II berakhir pada tahun?", correct:"1945", opts:["1942","1945","1950","1939"]},
+      {q:"Nama perdana menteri pertama Indonesia?", correct:"Sutan Syahrir", opts:["Moh. Hatta","Sutan Syahrir","Amir Syarifuddin","Ali Sastroamidjojo"]},
+      {q:"Konferensi Asia Afrika (KAA) dilaksanakan di?", correct:"Bandung", opts:["Jakarta","Bandung","Bogor","Surabaya"]},
+      {q:"VOC dibubarkan pada tahun?", correct:"1799", opts:["1602","1799","1800","1908"]},
+      {q:"Raja terkenal dari Kerajaan Singasari?", correct:"Kertanegara", opts:["Ken Arok","Kertanegara","Hayam Wuruk","Raden Wijaya"]},
+      {q:"Perjanjian Linggarjati terjadi antara RI dan?", correct:"Belanda", opts:["Inggris","Jepang","Belanda","Portugis"]},
+      {q:"G30S/PKI terjadi pada tahun?", correct:"1965", opts:["1945","1955","1965","1975"]},
+      {q:"Kerajaan Islam pertama di Indonesia?", correct:"Samudera Pasai", opts:["Demak","Samudera Pasai","Aceh","Mataram"]},
+      {q:"Tanam Paksa (Cultuurstelsel) dicetuskan oleh?", correct:"Van den Bosch", opts:["Daendels","Van den Bosch","Raffles","Jansen"]}
+    ],
+    sulit: [
+      {q:"Isi Trikora yang ketiga adalah?", correct:"Bersiap untuk mobilisasi umum", opts:["Bubarkan negara boneka Papua","Kibarkan sang merah putih","Bersiap untuk mobilisasi umum","Turunkan harga"]},
+      {q:"Revolusi Prancis terjadi tahun?", correct:"1789", opts:["1789","1776","1800","1917"]},
+      {q:"Nama kabinet pada masa Demokrasi Terpimpin?", correct:"Kabinet Kerja", opts:["Kabinet Kerja","Kabinet Ampera","Kabinet Natsir","Kabinet Wilopo"]},
+      {q:"Siapa penjelajah yang pertama mengelilingi dunia?", correct:"Magellan", opts:["Columbus","Magellan","Vasco da Gama","Cornelis de Houtman"]},
+      {q:"Prasasti Yupa merupakan peninggalan kerajaan?", correct:"Kutai", opts:["Tarumanegara","Kutai","Sriwijaya","Majapahit"]},
+      {q:"Dekrit Presiden 5 Juli 1959 menandai dimulainya?", correct:"Demokrasi Terpimpin", opts:["Demokrasi Liberal","Demokrasi Terpimpin","Orde Baru","Reformasi"]},
+      {q:"Perang Padri dipimpin oleh?", correct:"Tuanku Imam Bonjol", opts:["Pangeran Diponegoro","Tuanku Imam Bonjol","Sultan Hasanuddin","Teuku Umar"]},
+      {q:"Organisasi PBB didirikan pada tahun?", correct:"1945", opts:["1944","1945","1946","1948"]},
+      {q:"Tokoh 'Tiga Serangkai' Indische Partij adalah?", correct:"Douwes Dekker, Cipto, Suwardi", opts:["Soekarno, Hatta, Syahrir","Douwes Dekker, Cipto, Suwardi","Wahid, Amien, Mega","Kartini, Dewi, Cut Nyak"]},
+      {q:"Perjanjian Bongaya mengakhiri perlawanan di?", correct:"Makassar", opts:["Aceh","Bali","Makassar","Banten"]}
+    ]
+  },
+  ekonomi: {
+    mudah: [
+      {q:"Alat pembayaran yang sah disebut?", correct:"Uang", opts:["Cek","Uang","Kartu","Emas"]},
+      {q:"Kegiatan menghasilkan barang disebut?", correct:"Produksi", opts:["Konsumsi","Distribusi","Produksi","Investasi"]},
+      {q:"Orang yang menggunakan barang/jasa disebut?", correct:"Konsumen", opts:["Produsen","Distributor","Konsumen","Agen"]},
+      {q:"Mata uang negara Amerika Serikat?", correct:"Dollar", opts:["Euro","Rupiah","Yen","Dollar"]},
+      {q:"Tempat menyimpan uang yang aman?", correct:"Bank", opts:["Pasar","Bank","Koperasi","Toko"]},
+      {q:"Harga barang naik jika permintaan?", correct:"Naik", opts:["Turun","Tetap","Naik","Stabil"]},
+      {q:"BUMN singkatan dari?", correct:"Badan Usaha Milik Negara", opts:["Badan Usaha Milik Negara","Badan Umum Milik Nasional","Bank Umum Milik Negara","Biro Usaha Milik Negara"]},
+      {q:"Barang yang jumlahnya terbatas disebut barang?", correct:"Ekonomi", opts:["Bebas","Ekonomi","Substitusi","Komplementer"]},
+      {q:"Kebutuhan primer contohnya?", correct:"Makanan", opts:["Mobil","Liburan","Makanan","Perhiasan"]},
+      {q:"Sistem barter adalah tukar menukar?", correct:"Barang dengan barang", opts:["Uang dengan barang","Barang dengan barang","Jasa dengan uang","Uang dengan uang"]}
+    ],
+    sedang: [
+      {q:"Hukum permintaan: Harga naik, maka permintaan?", correct:"Turun", opts:["Naik","Turun","Tetap","Tak tentu"]},
+      {q:"Bapak Koperasi Indonesia?", correct:"Moh. Hatta", opts:["Soekarno","Suharto","Moh. Hatta","Habibie"]},
+      {q:"Pasar dengan hanya satu penjual disebut?", correct:"Monopoli", opts:["Oligopoli","Monopoli","Monopsoni","Duopoli"]},
+      {q:"Inflasi artinya?", correct:"Harga naik terus menerus", opts:["Harga turun","Nilai uang naik","Harga naik terus menerus","Ekspor meningkat"]},
+      {q:"APBN disusun oleh pemerintah bersama?", correct:"DPR", opts:["MPR","DPR","Presiden saja","Menteri Keuangan"]},
+      {q:"Saham adalah bukti kepemilikan?", correct:"Perusahaan", opts:["Tanah","Utang","Perusahaan","Negara"]},
+      {q:"Pajak yang dibayar setiap tahun untuk tanah?", correct:"PBB", opts:["PPh","PPn","PBB","Bea Cukai"]},
+      {q:"Koperasi berlandaskan asas?", correct:"Keluargaan", opts:["Keuntungan","Keluargaan","Persaingan","Efisiensi"]},
+      {q:"Barang pengganti disebut barang?", correct:"Substitusi", opts:["Komplementer","Substitusi","Mewah","Inferior"]},
+      {q:"Kebijakan mengurangi jumlah uang beredar disebut?", correct:"Kebijakan Moneter Kontraktif", opts:["Ekspansif","Fiskal","Moneter Kontraktif","Devaluasi"]}
+    ],
+    sulit: [
+      {q:"Kurva yang menghubungkan titik keseimbangan disebut?", correct:"Kurva Ekuilibrium", opts:["Kurva Indiferen","Kurva Ekuilibrium","Kurva Engel","Isoquant"]},
+      {q:"Rumus Pendapatan Nasional metode pengeluaran?", correct:"Y = C+I+G+(X-M)", opts:["Y = C+I+G+(X-M)","Y = r+w+i+p","Y = a+cY","Y = C+S"]},
+      {q:"Titik impas (tidak untung tidak rugi) disebut?", correct:"Break Even Point", opts:["Shut down point","Break Even Point","Profit Point","Loss Point"]},
+      {q:"Bank Sentral di Indonesia adalah?", correct:"Bank Indonesia", opts:["Bank Mandiri","BRI","Bank Indonesia","OJK"]},
+      {q:"Biaya yang tidak berubah meski produksi bertambah?", correct:"Fixed Cost", opts:["Variable Cost","Marginal Cost","Fixed Cost","Total Cost"]},
+      {q:"Organisasi perdagangan dunia adalah?", correct:"WTO", opts:["WHO","WTO","IMF","World Bank"]},
+      {q:"Hukum Gossen I membahas tentang?", correct:"Hukum kepuasan yang menurun", opts:["Hukum kepuasan yang menurun","Hukum produksi","Hukum distribusi","Hukum penawaran"]},
+      {q:"Inflasi yang sangat parah (>100%) disebut?", correct:"Hiperinflasi", opts:["Deflasi","Stagflasi","Hiperinflasi","Disinflasi"]},
+      {q:"Pasar yang dikuasai beberapa penjual?", correct:"Oligopoli", opts:["Monopoli","Oligopoli","Persaingan Sempurna","Monopsoni"]},
+      {q:"Kebijakan pemerintah membatasi jumlah impor disebut?", correct:"Kuota", opts:["Tarif","Dumping","Kuota","Subsidi"]}
+    ]
+  },
+  senbud: {
+    mudah: [
+      {q:"Warna merah dicampur kuning menghasilkan?", correct:"Oranye", opts:["Hijau","Ungu","Oranye","Coklat"]},
+      {q:"Alat musik yang dimainkan dengan ditiup?", correct:"Seruling", opts:["Gitar","Drum","Piano","Seruling"]},
+      {q:"Lagu 'Balonku Ada Lima' ciptaan?", correct:"A.T. Mahmud", opts:["Ibu Sud","Pak Kasur","A.T. Mahmud","W.R. Supratman"]},
+      {q:"Batik berasal dari negara?", correct:"Indonesia", opts:["Malaysia","Jepang","Indonesia","Thailand"]},
+      {q:"Seni rupa 2 dimensi memiliki ukuran?", correct:"Panjang & Lebar", opts:["Panjang, Lebar, Tinggi","Panjang & Lebar","Volume","Berat"]},
+      {q:"Patung adalah contoh seni rupa?", correct:"3 Dimensi", opts:["2 Dimensi","3 Dimensi","Terapan","Murni"]},
+      {q:"Gitar memiliki berapa senar (standar)?", correct:"6", opts:["4","5","6","7"]},
+      {q:"Tari Piring berasal dari?", correct:"Sumatera Barat", opts:["Jawa Barat","Sumatera Barat","Bali","Papua"]},
+      {q:"Nada Do, Re, Mi, Fa, Sol, La, Si, Do disebut?", correct:"Tangga Nada", opts:["Not Balok","Kunci G","Tangga Nada","Tempo"]},
+      {q:"Alat musik Sasando berasal dari?", correct:"NTT", opts:["NTT","Papua","Maluku","Sulawesi"]}
+    ],
+    sedang: [
+      {q:"Tari Saman berasal dari daerah?", correct:"Aceh", opts:["Aceh","Medan","Padang","Palembang"]},
+      {q:"Lukisan Monalisa karya dari?", correct:"Leonardo da Vinci", opts:["Picasso","Van Gogh","Leonardo da Vinci","Michaelangelo"]},
+      {q:"Alat musik Angklung terbuat dari?", correct:"Bambu", opts:["Kayu","Logam","Bambu","Plastik"]},
+      {q:"Lagu daerah 'Gundul-Gundul Pacul' dari?", correct:"Jawa Tengah", opts:["Jawa Barat","Jawa Tengah","Jawa Timur","Jakarta"]},
+      {q:"Fungsi utama seni rupa murni adalah?", correct:"Keindahan/Ekspresi", opts:["Kegunaan","Keindahan/Ekspresi","Ritual","Komersial"]},
+      {q:"Wayang Kulit diakui UNESCO sebagai warisan dari?", correct:"Indonesia", opts:["India","China","Indonesia","Kamboja"]},
+      {q:"Tempo 'Allegro' artinya?", correct:"Cepat", opts:["Lambat","Sedang","Cepat","Sangat Cepat"]},
+      {q:"Pelukis Affandi beraliran?", correct:"Ekspresionisme", opts:["Realisme","Ekspresionisme","Naturalisme","Kubisme"]},
+      {q:"Alat musik gamelan didominasi bahan?", correct:"Logam", opts:["Kayu","Bambu","Logam","Kulit"]},
+      {q:"Rumah adat Gadang berasal dari?", correct:"Sumatera Barat", opts:["Sumatera Utara","Sumatera Barat","Jambi","Riau"]}
+    ],
+    sulit: [
+      {q:"Aliran lukisan yang menggambarkan alam mimpi?", correct:"Surealisme", opts:["Realisme","Impressionisme","Surealisme","Romantisme"]},
+      {q:"Tanda kromatik 'Kres' (#) berfungsi untuk?", correct:"Menaikkan 1/2 nada", opts:["Menurunkan 1/2 nada","Menaikkan 1/2 nada","Mengembalikan nada","Menenangkan nada"]},
+      {q:"Pencipta lagu 'Bagimu Negeri' adalah?", correct:"Kusbini", opts:["Kusbini","Ismail Marzuki","C. Simanjuntak","Ibu Sud"]},
+      {q:"Teknik melukis dengan titik-titik disebut?", correct:"Pointilis", opts:["Aquarel","Plakat","Pointilis","Arsir"]},
+      {q:"Bapak Seni Rupa Modern Indonesia?", correct:"Raden Saleh", opts:["Affandi","Basuki Abdullah","Raden Saleh","S. Sudjojono"]},
+      {q:"Tari Kontemporer adalah jenis tari?", correct:"Masa kini / Modern", opts:["Klasik","Tradisional","Masa kini / Modern","Primitif"]},
+      {q:"Interval nada dari Do ke Sol disebut?", correct:"Kwint", opts:["Terts","Kwart","Kwint","Oktaf"]},
+      {q:"Alat musik Chordophone sumber bunyinya dari?", correct:"Dawai/Senar", opts:["Udara","Selaput","Badan alat","Dawai/Senar"]},
+      {q:"Candi Prambanan memiliki relief kisah?", correct:"Ramayana", opts:["Mahabharata","Ramayana","Sutasoma","Arjuna Wiwaha"]},
+      {q:"Istilah 'Acapella' berarti?", correct:"Musik tanpa instrumen", opts:["Musik orkestra","Musik tanpa instrumen","Paduan suara","Solo vokal"]}
+    ]
+  },
+  sosiologi: {
+    mudah: [
+      {q:"Manusia tidak bisa hidup sendiri, disebut makhluk?", correct:"Sosial", opts:["Individu","Ekonomi","Sosial","Politik"]},
+      {q:"Keluarga yang terdiri dari Ayah, Ibu, Anak disebut?", correct:"Keluarga Inti", opts:["Keluarga Luas","Keluarga Inti","Kerabat","Komunitas"]},
+      {q:"Sopan santun termasuk norma?", correct:"Kesopanan", opts:["Hukum","Agama","Kesopanan","Kesusilaan"]},
+      {q:"Gotong royong merupakan contoh?", correct:"Kerja sama", opts:["Persaingan","Konflik","Kerja sama","Kontravensi"]},
+      {q:"Sanksi pelanggaran norma hukum adalah?", correct:"Tegas & Mengikat", opts:["Celaan","Dosa","Pengucilan","Tegas & Mengikat"]},
+      {q:"Interaksi sosial minimal melibatkan ... orang", correct:"2", opts:["1","2","3","4"]},
+      {q:"Tempat berlangsungnya pendidikan formal?", correct:"Sekolah", opts:["Keluarga","Sekolah","Masyarakat","Pasar"]},
+      {q:"Suku Batak berasal dari?", correct:"Sumatera Utara", opts:["Sumatera Barat","Sumatera Utara","Jawa","Kalimantan"]},
+      {q:"Masyarakat perkotaan cenderung bersifat?", correct:"Individualis", opts:["Gotong royong","Individualis","Tradisional","Religius"]},
+      {q:"Sikap menghargai perbedaan disebut?", correct:"Toleransi", opts:["Diskriminasi","Toleransi","Etnosentrisme","Fanatisme"]}
+    ],
+    sedang: [
+      {q:"Perpindahan status sosial disebut?", correct:"Mobilitas Sosial", opts:["Stratifikasi","Diferensiasi","Mobilitas Sosial","Sosialisasi"]},
+      {q:"Bapak Sosiologi Dunia?", correct:"Auguste Comte", opts:["Karl Marx","Max Weber","Auguste Comte","Emile Durkheim"]},
+      {q:"Masalah sosial akibat ketidaksesuaian nilai?", correct:"Disorganisasi", opts:["Integrasi","Disorganisasi","Konformitas","Harmoni"]},
+      {q:"Proses penyesuaian unsur yang berbeda disebut?", correct:"Integrasi", opts:["Konflik","Integrasi","Kompetisi","Disintegrasi"]},
+      {q:"Kelompok sosial yang erat dan intim (Gemeinschaft)?", correct:"Paguyuban", opts:["Patembayan","Paguyuban","Publik","Massa"]},
+      {q:"Penyelesaian konflik dengan pihak ketiga netral?", correct:"Mediasi", opts:["Arbitrase","Koersi","Mediasi","Ajudikasi"]},
+      {q:"Stratifikasi sosial tertutup contohnya?", correct:"Kasta", opts:["Kelas Ekonomi","Pendidikan","Kasta","Jabatan"]},
+      {q:"Perilaku menyimpang disebut juga?", correct:"Deviasi Sosial", opts:["Konformitas","Deviasi Sosial","Interaksi","Sosialisasi"]},
+      {q:"Sikap menganggap budayanya paling baik?", correct:"Etnosentrisme", opts:["Nasionalisme","Patriotisme","Etnosentrisme","Xenofobia"]},
+      {q:"Fungsi laten lembaga pendidikan?", correct:"Menunda pernikahan", opts:["Mengajarkan skill","Menunda pernikahan","Membentuk karakter","Transfer ilmu"]}
+    ],
+    sulit: [
+      {q:"Teori Konflik Kelas dikemukakan oleh?", correct:"Karl Marx", opts:["Max Weber","Karl Marx","Durkheim","Comte"]},
+      {q:"Tindakan sosial berorientasi nilai (Max Weber)?", correct:"Werkrational", opts:["Zweckrational","Werkrational","Afektif","Tradisional"]},
+      {q:"Solidaritas masyarakat modern menurut Durkheim?", correct:"Organik", opts:["Mekanik","Organik","Sosial","Kultural"]},
+      {q:"Proses pudarnya norma dan nilai disebut?", correct:"Anomie", opts:["Alienasi","Anomie","Difusi","Akulturasi"]},
+      {q:"Penelitian sosiologi yang menggunakan angka/statistik?", correct:"Kuantitatif", opts:["Kualitatif","Kuantitatif","Studi Kasus","Etnografi"]},
+      {q:"Penyatuan dua budaya menghasilkan budaya baru?", correct:"Asimilasi", opts:["Akulturasi","Asimilasi","Difusi","Inovasi"]},
+      {q:"Gerakan sosial untuk merubah tatanan masyarakat?", correct:"Revolusi", opts:["Reformasi","Revolusi","Evolusi","Rotasi"]},
+      {q:"Status yang didapat karena usaha sendiri?", correct:"Achieved Status", opts:["Ascribed Status","Assigned Status","Achieved Status","Symbolic Status"]},
+      {q:"Teori 'Bunuh Diri' (Suicide) dikaji oleh?", correct:"Emile Durkheim", opts:["Marx","Comte","Durkheim","Spencer"]},
+      {q:"Kelompok yang menjadi acuan bagi individu?", correct:"Reference Group", opts:["In Group","Out Group","Reference Group","Primary Group"]}
+    ]
+  },
+  geografi: {
+    mudah: [
+      {q:"Indonesia terletak di benua?", correct:"Asia", opts:["Afrika","Eropa","Asia","Australia"]},
+      {q:"Ibukota Jawa Barat adalah?", correct:"Bandung", opts:["Semarang","Surabaya","Bandung","Jakarta"]},
+      {q:"Gunung tertinggi di dunia?", correct:"Everest", opts:["Semeru","Fuji","Everest","Kilimanjaro"]},
+      {q:"Alat untuk menunjukkan arah mata angin?", correct:"Kompas", opts:["Peta","Globe","Kompas","Atlas"]},
+      {q:"Negara tetangga yang berbatasan darat dengan RI di Kalimantan?", correct:"Malaysia", opts:["Singapura","Malaysia","Thailand","Filipina"]},
+      {q:"Lautan yang sangat luas disebut?", correct:"Samudra", opts:["Danau","Laut","Teluk","Samudra"]},
+      {q:"Indonesia memiliki berapa musim?", correct:"2", opts:["2","3","4","1"]},
+      {q:"Provinsi paling barat di Indonesia?", correct:"Aceh", opts:["Papua","Aceh","Bali","Lampung"]},
+      {q:"Tiruan bumi dalam bentuk bulat kecil?", correct:"Globe", opts:["Peta","Atlas","Globe","Denah"]},
+      {q:"Matahari terbit dari arah?", correct:"Timur", opts:["Barat","Selatan","Utara","Timur"]}
+    ],
+    sedang: [
+      {q:"Garis khayal yang membagi bumi Utara & Selatan?", correct:"Khatulistiwa", opts:["Meridian","Khatulistiwa","Bujur","Tanggal Internasional"]},
+      {q:"Danau terbesar di Indonesia?", correct:"Danau Toba", opts:["Danau Singkarak","Danau Toba","Danau Poso","Danau Towuti"]},
+      {q:"Lapisan udara yang menyelimuti bumi?", correct:"Atmosfer", opts:["Litosfer","Hidrosfer","Atmosfer","Biosfer"]},
+      {q:"Gempa bumi di dasar laut bisa menyebabkan?", correct:"Tsunami", opts:["Banjir","Longsor","Tsunami","Erosi"]},
+      {q:"Tenaga pembentuk muka bumi dari dalam?", correct:"Endogen", opts:["Eksogen","Endogen","Vulkanik","Tektonik"]},
+      {q:"Hutan yang daunnya gugur saat kemarau?", correct:"Hutan Musim", opts:["Hutan Hujan","Hutan Musim","Sabana","Stepa"]},
+      {q:"Indonesia diapit oleh dua samudra, yaitu?", correct:"Hindia & Pasifik", opts:["Hindia & Atlantik","Pasifik & Atlantik","Hindia & Pasifik","Arktik & Hindia"]},
+      {q:"Ilmu yang mempelajari peta disebut?", correct:"Kartografi", opts:["Geologi","Kartografi","Oseanografi","Meteorologi"]},
+      {q:"Angin yang berganti arah setiap 6 bulan?", correct:"Angin Muson", opts:["Angin Pasat","Angin Muson","Angin Lokal","Angin Topan"]},
+      {q:"Batuan yang berasal dari magma yang membeku?", correct:"Batuan Beku", opts:["Sedimen","Metamorf","Batuan Beku","Malihan"]}
+    ],
+    sulit: [
+      {q:"Lapisan atmosfer tempat terjadinya cuaca?", correct:"Troposfer", opts:["Stratosfer","Troposfer","Mesosfer","Termosfer"]},
+      {q:"Teori pergeseran benua dikemukakan oleh?", correct:"Alfred Wegener", opts:["Darwin","Alfred Wegener","Immanuel Kant","Laplace"]},
+      {q:"SIG singkatan dari?", correct:"Sistem Informasi Geografis", opts:["Sistem Informasi Geologi","Sistem Informasi Geografis","Satelit Inti Geografi","Survei Inter Geografi"]},
+      {q:"Pola pemukiman di sepanjang sungai biasanya?", correct:"Linear/Memanjang", opts:["Radial","Terpusat","Menyebar","Linear/Memanjang"]},
+      {q:"El Nino menyebabkan Indonesia mengalami?", correct:"Kekeringan panjang", opts:["Hujan lebat","Kekeringan panjang","Badai","Gempa"]},
+      {q:"Klasifikasi iklim berdasarkan curah hujan (Koppen)?", correct:"Af, Aw, Am", opts:["A, B, C","Af, Aw, Am","Oldeman","Schmidth-Ferguson"]},
+      {q:"Zona Ekonomi Eksklusif (ZEE) lebarnya?", correct:"200 mil", opts:["12 mil","200 mil","24 mil","100 mil"]},
+      {q:"Batuan sedimen yang berubah karena suhu/tekanan?", correct:"Metamorf", opts:["Beku","Sedimen","Metamorf","Vulkanik"]},
+      {q:"Pusat gempa di dalam bumi disebut?", correct:"Hiposentrum", opts:["Episentrum","Hiposentrum","Seismograf","Magnitudo"]},
+      {q:"Bonus Demografi terjadi jika?", correct:"Usia produktif dominan", opts:["Lansia dominan","Anak-anak dominan","Usia produktif dominan","Penduduk sedikit"]}
+    ]
+  },
+  kimia: {
+    mudah: [
+      {q:"Lambang unsur Oksigen?", correct:"O", opts:["H","O","N","C"]},
+      {q:"Rumus kimia air?", correct:"H2O", opts:["CO2","H2O","O2","NaCl"]},
+      {q:"Benda gas untuk bernapas?", correct:"Oksigen", opts:["Karbon","Nitrogen","Oksigen","Hidrogen"]},
+      {q:"Rasa air jeruk adalah?", correct:"Asam", opts:["Manis","Pahit","Asam","Asin"]},
+      {q:"Garam dapur rumus kimianya?", correct:"NaCl", opts:["H2SO4","NaCl","KCl","NaOH"]},
+      {q:"Logam yang berkarat berwarna?", correct:"Coklat kemerahan", opts:["Biru","Hijau","Coklat kemerahan","Putih"]},
+      {q:"Emas lambang unsurnya?", correct:"Au", opts:["Ag","Au","Fe","Cu"]},
+      {q:"Zat tunggal yang tidak bisa diuraikan?", correct:"Unsur", opts:["Senyawa","Campuran","Larutan","Unsur"]},
+      {q:"Air dan minyak jika disatukan akan?", correct:"Terpisah", opts:["Menyatu","Meledak","Terpisah","Membeku"]},
+      {q:"PH netral bernilai?", correct:"7", opts:["1","7","14","0"]}
+    ],
+    sedang: [
+      {q:"Partikel atom bermuatan negatif?", correct:"Elektron", opts:["Proton","Neutron","Elektron","Positron"]},
+      {q:"Zat yang memerahkan lakmus biru?", correct:"Asam", opts:["Basa","Garam","Netral","Air"]},
+      {q:"Ikatan kimia pemakaian elektron bersama?", correct:"Kovalen", opts:["Ionik","Logam","Kovalen","Hidrogen"]},
+      {q:"Nomor atom menunjukkan jumlah?", correct:"Proton", opts:["Neutron","Proton","Massa","Kulit"]},
+      {q:"Unsur golongan VIIIA disebut?", correct:"Gas Mulia", opts:["Halogen","Alkali","Gas Mulia","Logam"]},
+      {q:"Rumus Asam Sulfat?", correct:"H2SO4", opts:["HCl","H2SO4","HNO3","CH3COOH"]},
+      {q:"Pemisahan campuran berdasarkan titik didih?", correct:"Distilasi", opts:["Filtrasi","Kromatografi","Distilasi","Sublimasi"]},
+      {q:"Mol adalah satuan jumlah?", correct:"Zat", opts:["Massa","Volume","Zat","Energi"]},
+      {q:"Reaksi yang melepaskan panas?", correct:"Eksoterm", opts:["Endoterm","Eksoterm","Isoterm","Adiabatik"]},
+      {q:"Bahan utama pembuat kaca?", correct:"Silika", opts:["Karbon","Silika","Besi","Tembaga"]}
+    ],
+    sulit: [
+      {q:"Bilangan Avogadro bernilai?", correct:"6.02 x 10^23", opts:["6.02 x 10^23","9.8 x 10^23","1.6 x 10^-19","3.14"]},
+      {q:"Bentuk molekul air (H2O)?", correct:"V (Bengkok)", opts:["Linear","Tetrahedral","V (Bengkok)","Oktahedral"]},
+      {q:"Hidrokarbon jenuh (ikatan tunggal) disebut?", correct:"Alkana", opts:["Alkena","Alkuna","Alkana","Benzena"]},
+      {q:"Hukum kekekalan massa dikemukakan oleh?", correct:"Lavoisier", opts:["Dalton","Lavoisier","Proust","Avogadro"]},
+      {q:"Larutan penyangga (Buffer) berfungsi?", correct:"Mempertahankan pH", opts:["Mengubah pH","Mempertahankan pH","Menetralkan racun","Mengendapkan zat"]},
+      {q:"Gugus fungsi alkohol adalah?", correct:"-OH", opts:["-OH","-COOH","-CHO","-O-"]},
+      {q:"Isotop adalah atom dengan jumlah ... sama", correct:"Proton", opts:["Neutron","Massa","Elektron","Proton"]},
+      {q:"Reaksi redoks melibatkan perpindahan?", correct:"Elektron", opts:["Proton","Elektron","Neutron","Inti"]},
+      {q:"Derajat keasaman (pH) + pOH =", correct:"14", opts:["7","10","14","0"]},
+      {q:"Katalis berfungsi untuk?", correct:"Mempercepat reaksi", opts:["Memperambat reaksi","Mempercepat reaksi","Menghentikan reaksi","Menambah hasil"]}
+    ]
+  },
+  biologi: {
+    mudah: [
+      {q:"Hewan pemakan tumbuhan?", correct:"Herbivora", opts:["Karnivora","Omnivora","Herbivora","Insektivora"]},
+      {q:"Alat pernapasan ikan?", correct:"Insang", opts:["Paru-paru","Trakea","Insang","Kulit"]},
+      {q:"Bagian tumbuhan untuk fotosintesis?", correct:"Daun", opts:["Akar","Batang","Daun","Bunga"]},
+      {q:"Manusia bernapas menghirup?", correct:"Oksigen", opts:["Karbon Dioksida","Nitrogen","Oksigen","Helium"]},
+      {q:"Hewan yang menyusui anaknya?", correct:"Mamalia", opts:["Reptil","Aves","Mamalia","Amfibi"]},
+      {q:"Tulang yang melindungi otak?", correct:"Tengkorak", opts:["Rusuk","Tengkorak","Panggul","Belakang"]},
+      {q:"Makhluk hidup terkecil disebut?", correct:"Mikroorganisme", opts:["Hewan","Tumbuhan","Mikroorganisme","Jamur"]},
+      {q:"Proses perubahan ulat menjadi kupu-kupu?", correct:"Metamorfosis", opts:["Simbiosis","Metamorfosis","Adaptasi","Reproduksi"]},
+      {q:"Indra pengecap manusia?", correct:"Lidah", opts:["Hidung","Mata","Kulit","Lidah"]},
+      {q:"Ayam berkembang biak dengan?", correct:"Bertelur", opts:["Melahirkan","Bertelur","Membelah diri","Spora"]}
+    ],
+    sedang: [
+      {q:"Unit struktural terkecil makhluk hidup?", correct:"Sel", opts:["Jaringan","Organ","Sel","Sistem Organ"]},
+      {q:"Zat hijau daun disebut?", correct:"Klorofil", opts:["Stomata","Klorofil","Floem","Xilem"]},
+      {q:"Simbiosis yang satu untung, satu rugi?", correct:"Parasitisme", opts:["Mutualisme","Komensalisme","Parasitisme","Amensalisme"]},
+      {q:"Penyakit kekurangan darah?", correct:"Anemia", opts:["Leukemia","Anemia","Hipertensi","Hemofilia"]},
+      {q:"Enzim di mulut yang memecah karbohidrat?", correct:"Amilase/Ptialin", opts:["Pepsin","Renin","Amilase/Ptialin","Lipase"]},
+      {q:"Pembuluh darah yang mengalir ke jantung?", correct:"Vena", opts:["Arteri","Vena","Kapiler","Aorta"]},
+      {q:"Organ ekskresi penyaring darah?", correct:"Ginjal", opts:["Hati","Kulit","Paru-paru","Ginjal"]},
+      {q:"Bapak Genetika adalah?", correct:"Mendel", opts:["Darwin","Pasteur","Mendel","Lamarck"]},
+      {q:"Jamur tempe adalah jenis?", correct:"Rhizopus", opts:["Saccharomyces","Rhizopus","Penicillium","Aspergillus"]},
+      {q:"Hewan berdarah dingin disebut?", correct:"Poikiloterm", opts:["Homoiterm","Poikiloterm","Mamalia","Primata"]}
+    ],
+    sulit: [
+      {q:"Tempat sintesis protein dalam sel?", correct:"Ribosom", opts:["Mitokondria","Ribosom","Lisosom","Nukleus"]},
+      {q:"Pembelahan sel kelamin (reduksi) disebut?", correct:"Meiosis", opts:["Mitosis","Meiosis","Amitosis","Biner"]},
+      {q:"Hormon yang memacu pertumbuhan batang?", correct:"Auksin", opts:["Sitokinin","Giberelin","Auksin","Gas Etilen"]},
+      {q:"Basa nitrogen DNA: A, T, G, dan ...", correct:"C (Sitosin)", opts:["U (Urasil)","C (Sitosin)","K (Kalium)","P (Posfat)"]},
+      {q:"Organel sel penghasil energi (ATP)?", correct:"Mitokondria", opts:["Kloroplas","Mitokondria","Retikulum Endoplasma","Vakuola"]},
+      {q:"Teori Evolusi 'Natural Selection' oleh?", correct:"Charles Darwin", opts:["Lamarck","Darwin","Mendel","Wallace"]},
+      {q:"Jaringan pengangkut air pada tumbuhan?", correct:"Xilem", opts:["Floem","Xilem","Kambium","Epidermis"]},
+      {q:"Penyakit karena virus HIV menyerang?", correct:"Sistem Imun", opts:["Hati","Sistem Saraf","Sistem Imun","Darah merah"]},
+      {q:"Persilangan dengan satu sifat beda?", correct:"Monohibrid", opts:["Dihibrid","Monohibrid","Polihibrid","Intermediet"]},
+      {q:"Bakteri berbentuk bulat disebut?", correct:"Coccus", opts:["Bacillus","Spiral","Coccus","Vibrio"]}
+    ]
+  }
+};
+
+// GLOBAL VARIABLES
+let mapel="", level="", idx=0, skor=0, soalAktif=[];
+let waktu=10, timerInterval;
+const MAX_TIME = 10;
+
+function $(id){ return document.getElementById(id);} 
+
+// NAVIGASI
+function pilihMapel(m){ mapel=m; show('menu'); }
+function backToMapel(){ clearInterval(timerInterval); show('mapel'); }
+
+// MULAI GAME
+function startGame(lv){
+  level = lv; skor = 0; idx = 0;
+  // Ambil soal & Acak urutan soal
+  if(soalMapel[mapel] && soalMapel[mapel][level]){
+      soalAktif = [...soalMapel[mapel][level]].sort(()=>Math.random()-0.5);
+  } else {
+      alert("Database soal belum diisi!"); return;
+  }
+  show('quiz'); tampilSoal();
+}
+
+// TAMPILKAN SOAL
+function tampilSoal(){
+  const q = soalAktif[idx];
+  if(!q){ tampilkanHasil(); return; } // Game Selesai
+
+  $("qText").textContent = q.q;
+  $("options").innerHTML = "";
+  $("nextBtn").style.display = "none";
+  
+  // Update Header
+  $("progress").textContent = `${idx+1} / ${soalAktif.length}`;
+
+  // Acak Pilihan Jawaban
+  let acakOpts = [...q.opts].sort(() => Math.random() - 0.5);
+
+  acakOpts.forEach(o => {
+    let btn = document.createElement("div");
+    btn.className = "opt";
+    btn.textContent = o;
+    // Event Click
+    btn.onclick = () => cekJawaban(btn, q.correct);
+    $("options").appendChild(btn);
+  });
+
+  resetTimer();
+}
+
+// TIMER LOGIC (10 Detik)
+function resetTimer(){
+  clearInterval(timerInterval);
+  waktu = MAX_TIME;
+  updateTimerUI();
+  
+  timerInterval = setInterval(() => {
+    waktu--;
+    updateTimerUI();
+    if(waktu <= 0){
+      waktuHabis();
+    }
+  }, 1000);
+}
+
+function updateTimerUI(){
+  $("timerNum").textContent = waktu;
+  let percent = (waktu / MAX_TIME) * 100;
+  $("timerBar").style.width = percent + "%";
+  
+  // Ubah warna bar jika kritis
+  if(waktu <= 3) $("timerBar").style.background = "#FF5252";
+  else $("timerBar").style.background = "#00d2ff";
+}
+
+// LOGIKA JIKA WAKTU HABIS
+function waktuHabis(){
+  clearInterval(timerInterval);
+  // Highlight jawaban benar otomatis
+  highlightCorrectAnswer();
+  disableAllOptions();
+  $("nextBtn").style.display = "block";
+}
+
+// LOGIKA CEK JAWABAN
+function cekJawaban(el, correctAns){
+  clearInterval(timerInterval); // BERHENTIKAN WAKTU
+  disableAllOptions(); // Kunci semua tombol
+
+  if(el.textContent === correctAns){
+    el.classList.add('correct'); // Tambah warna hijau
+    skor += 10;
+  } else {
+    el.classList.add('wrong'); // Tambah warna merah
+    highlightCorrectAnswer(correctAns); // Tunjukkan yang benar
+  }
+
+  // Tampilkan tombol lanjut
+  if(idx < soalAktif.length){
+      $("nextBtn").textContent = (idx === soalAktif.length - 1) ? "Lihat Hasil 🏆" : "Lanjut ➡️";
+      $("nextBtn").style.display = "block";
+  } else {
+      setTimeout(tampilkanHasil, 1000);
+  }
+}
+
+// FUNGSI BANTUAN
+function highlightCorrectAnswer(answerText){
+  // Cari tombol yang teksnya sesuai jawaban benar
+  let opts = document.querySelectorAll('.opt');
+  const q = soalAktif[idx];
+  opts.forEach(opt => {
+    if(opt.textContent === (answerText || q.correct)){
+      opt.classList.add('correct');
+    }
+  });
+}
+
+function disableAllOptions(){
+  document.querySelectorAll('.opt').forEach(o => o.classList.add('disabled'));
+}
+
+function nextQuestion(){
+  idx++;
+  tampilSoal();
+}
+
+// HASIL AKHIR
+function tampilkanHasil(){
+  clearInterval(timerInterval);
+  show('final');
+  
+  // Animasi angka skor
+  let currentDisplay = 0;
+  let interval = setInterval(() => {
+    if(currentDisplay >= skor){
+      clearInterval(interval);
+      $("finalScore").textContent = skor;
+    } else {
+      currentDisplay++;
+      $("finalScore").textContent = currentDisplay;
+    }
+  }, 20);
+
+  // Pesan Motivasi
+  let msg = "";
+  if(skor >= 80) msg = "Kamu Jenius! 🌟";
+  else if(skor >= 50) msg = "Lumayan, Tingkatkan lagi! 💪";
+  else msg = "Jangan menyerah, coba lagi! 🔥";
+  $("finalMsg").textContent = msg;
+}
+
+function show(id){
+  ["mapel","menu","quiz","final"].forEach(v => {
+    $(v).style.display = v === id ? "block" : "none";
+  });
+}
+</script>
+</body>
+</html>
